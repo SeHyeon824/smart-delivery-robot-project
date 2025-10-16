@@ -101,3 +101,7 @@ Raspberry Pi Environment Setup:
 Problem: Encountered externally-managed-environment errors with pip and ModuleNotFoundError: No module named 'libcamera' due to recent OS policy changes and library dependencies.
 
 Solution: Established a robust development environment by creating a venv virtual environment with the --system-site-packages option. This allowed the virtual environment to access system-level libraries (like python3-libcamera) installed via apt, while still managing project-specific packages independently. Also installed necessary build tools like cmake and libcap-dev.y
+=======
+# smart-delivery-robot-project
+ROS-based autonomous delivery robot with real-time SLAM and dual-authentication (Face Recognition + Telegram)
+>>>>>>> 0687881c53e7c89b8f7929c0a21390c03575fe91
