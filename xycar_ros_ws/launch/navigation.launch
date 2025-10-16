@@ -1,0 +1,30 @@
+<launch>
+
+    <node name="move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
+
+        <rosparam file="$(find sehyen_project)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find sehyen_project)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find sehyen_project)/config/local_costmap_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find sehyen_project)/config/global_costmap_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find sehyen_project)/config/base_local_planner_params.yaml" command="load" ns="base_local_planner" />
+    	<rosparam file="$(find sehyen_project)/config/recovery_params.yaml" command="load" />
+	
+
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
+
+        <param name="controller_frequency" value="10.0"/>
+        <param name="planner_patience" value="5.0"/>
+        <param name="controller_patience" value="1.5"/>
+
+        <param name="oscillation_timeout" value="5.0" />
+        <param name="oscillation_distance" value="0.2" />
+
+    </node>
+
+    <!--  목적지 도착 시 얼굴 인식 HTTP 요청 노드 -->
+    <node pkg="sehyen_project"
+          type="destination_watcher.py"
+          name="destination_watcher"
+          output="screen" />
+
+</launch>

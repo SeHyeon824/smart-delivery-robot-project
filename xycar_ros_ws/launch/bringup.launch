@@ -1,0 +1,40 @@
+<launch>
+	<include file="$(find sehyen_project)/launch/load_robot_model.launch" />
+  <!-- 공통 인자 -->
+  <arg name="config_dir" value="$(find sehyen_project)/config"/>
+  <arg name="config_file_name" value="default.lua"/>
+  <arg name="urdf_file"  value="$(find sehyen_project)/urdf/xycar.urdf"/>
+  <arg name="rviz_file"  value="$(find sehyen_project)/rviz/mapping.rviz"/>
+
+  <param name="/use_sim_time" value="false"/>
+  <param name="robot_description" command="$(find xacro)/xacro $(arg urdf_file)"/>
+
+  <!-- ① 센서 드라이버 -->
+  <include file="$(find xycar_lidar)/launch/xycar_lidar.launch"/>
+  <include file="$(find xycar_imu)/launch/xycar_imu.launch"/>
+
+  <!-- base_link <-> laser_frame -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_laser"
+        args="0.15 0 0.23 0 0 0 1 base_link laser_frame"/>
+
+  <!-- base_link <-> imu -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_imu"
+        args="0.08 0 0.175 0 0 0 1 base_link imu"/>
+
+  <!-- ② SLAM (별도 파일로 분리) -->
+  <include file="$(find sehyen_project)/launch/slam.launch">
+    <arg name="config_dir" value="$(arg config_dir)"/>
+    <arg name="config_file_name" value="$(arg config_file_name)"/>
+    <arg name="urdf_file" value="$(arg urdf_file)"/>
+  </include>
+
+  <!-- ③ 모터 -->
+  <include file="$(find xycar_motor)/launch/xycar_motor.launch"/>
+
+  <node pkg="xycar_motor" type="xycar_motor_node" name="xycar_motor_node" output="screen">
+  <remap from="/motor/cmd_vel" to="/cmd_vel" />
+</node>
+
+  <!-- ④ RViz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_file)"/>
+</launch>

@@ -1,0 +1,57 @@
+#================================================================#
+#                 Global Costmap Configuration                   #
+#================================================================#
+
+# 전역 비용지도의 기준 좌표계 및 로봇 베이스 좌표계 설정
+global_frame: map
+robot_base_frame: base_link
+
+# 전역 비용지도의 업데이트 및 발행 주기 (Hz)
+# 정적 지도를 사용하므로 자주 업데이트할 필요는 없지만, 장애물 레이어 등을 위해 설정합니다.
+update_frequency: 1.0
+publish_frequency: 0.5
+
+# TF 변환을 기다리는 최대 시간 (초). 이전 값(1.0)을 유지합니다.
+transform_tolerance: 1.0
+
+# 전역 비용지도는 SLAM이 생성한 정적 지도를 사용합니다.
+# 이 파라미터는 아래 plugins 방식에서는 직접 사용되지 않지만, 명시적으로 true로 두는 것이 좋습니다.
+static_map: true
+
+# 사용할 코스트맵 레이어 플러그인 목록. 아래에서부터 위 순서로 레이어가 겹쳐집니다.
+plugins:
+  - {name: static_layer,    type: "costmap_2d::StaticLayer"}
+  - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"} # 3D 공간을 고려하는 VoxelLayer 사용 권장
+  - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+
+
+#=================== Layer-Specific Parameters ====================#
+
+# Static Layer: SLAM이 생성한 지도를 받아와 비용지도의 기초를 만듭니다.
+static_layer:
+  enabled: true
+  map_topic: "/map" # SLAM 또는 map_server가 발행하는 지도 토픽
+
+# Obstacle Layer: 센서 데이터를 사용하여 동적/정적 장애물을 표기합니다.
+obstacle_layer:
+  enabled: true
+  # 장애물 감지에 사용할 센서 목록
+  observation_sources: laser_scan_sensor
+
+  laser_scan_sensor:
+    # ⚠️ 중요: 센서의 실제 TF 프레임 이름으로 설정해야 합니다. 'base_link'가 아닌 'laser_frame'이 올바릅니다.
+    sensor_frame: laser_frame
+    data_type: LaserScan
+    topic: /scan
+    marking: true # 이 센서로 장애물을 그림
+    clearing: true # 이 센서로 빈 공간을 그림
+    obstacle_range: 3.5 # 이 거리 내의 장애물만 유효
+    raytrace_range: 4.0 # 이 거리까지 빈 공간을 그림
+
+# Inflation Layer: 장애물 주변에 안전거리를 설정하여 로봇이 부딪히지 않도록 합니다.
+inflation_layer:
+  enabled: true
+  # ⚠️ 중요: 로봇의 실제 크기(footprint)와 주행 환경을 고려하여 신중하게 설정해야 합니다.
+  # 로봇이 좁은 길을 통과하지 못한다면 이 값을 줄여야 합니다.
+  inflation_radius: 0.4
+  cost_scaling_factor: 3.5 # 팽창 비용의 감쇠율. 높을수록 장애물에 더 강하게 패널티 부여

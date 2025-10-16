@@ -1,0 +1,17 @@
+# recovery_params.yaml
+
+recovery_behaviors:
+  - name: 'conservative_reset'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  - name: 'aggressive_reset'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+
+# 1차 복구 시도: 1.0미터 후진
+# 로봇이 막혔을 때 가장 먼저 시도하는 행동
+conservative_reset:
+  reset_distance: 1.5  # 1.0미터 '뒤로' 이동하도록 음수 값 설정
+
+# 2차 복구 시도: 2.5미터 후진
+# 1차 시도 후에도 여전히 막혀있을 때 시도하는 더 과감한 행동
+aggressive_reset:
+  reset_distance: 2.5  # 2.5미터 '뒤로' 이동하도록 음수 값 설정

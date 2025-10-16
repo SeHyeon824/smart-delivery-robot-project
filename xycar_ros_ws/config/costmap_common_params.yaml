@@ -1,0 +1,38 @@
+# [Xycar 맞춤 설정 필요!] 로봇의 발자국 모양 (로봇 중심 (0,0) 기준 각 꼭짓점 좌표)
+# 예시: Xycar의 앞쪽이 x축 +방향, 길이 0.4m, 폭 0.2m 가정 시
+# footprint: [ [0.2, 0.1], [0.2, -0.1], [-0.2, -0.1], [-0.2, 0.1] ]
+# Xycar의 실제 크기를 측정하여 정확한 값을 입력해주세요.
+footprint: [ [0.35, 0.25], [0.35, -0.25], [-0.35, -0.25], [-0.35, 0.25] ] # << 사용자 Xycar에 맞게 수정!
+robot_base_frame: base_link
+
+# robot_radius: 0.2 # footprint 대신 원형으로 로봇을 근사한다면 사용 (footprint와 동시 사용 X)
+
+obstacle_layer:
+  enabled: true
+  # [Xycar 맞춤 설정 필요!] obstacle_range와 raytrace_range는 센서의 range_max (이전 확인 값: 16.0m) 고려
+  obstacle_range: 3.5  # 예시: 3.5미터 내의 장애물을 감지
+  raytrace_range: 4.0  # 예시: 4.0미터까지 장애물이 사라졌는지 추적
+  
+  # [Xycar 맞춤 설정 필요!] inflation_radius는 로봇 크기, 주행 속도 등을 고려하여 설정
+  inflation_radius: 0.30 # 예시 값 (m)
+
+  combination_method: 1 # 여러 레이어 결합 방식 (0: Overwrite, 1: Maximum)
+
+  observation_sources: laser_scan_sensor # 사용할 센서 소스 이름
+
+  laser_scan_sensor: {
+    sensor_frame: laser_frame,    # '/scan' 토픽의 header.frame_id 값
+    data_type: LaserScan,         # '/scan' 토픽의 메시지 타입
+    topic: /scan,                 # 사용할 LiDAR 토픽 이름
+    marking: true,                # 이 센서 데이터로 장애물을 지도에 표시
+    clearing: true                # 이 센서 데이터로 장애물이 없는 공간을 지도에서 지움
+  }
+
+inflation_layer:
+  enabled: true
+  cost_scaling_factor: 5.0  # 비용 증가율 (높을수록 장애물 강하게 회피)
+  inflation_radius: 0.2  # obstacle_layer의 inflation_radius와 동일하게 또는 유사하게 설정
+
+static_layer:
+  enabled: true
+  map_topic: "/map"         # map_server가 발행하는 정적 지도 토픽

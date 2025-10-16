@@ -1,0 +1,11 @@
+<launch>
+
+  <!-- 1. teleop_twist_keyboard 키보드 입력 노드 실행 -->
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard" output="screen">
+    <param name="scale_linear" value="0.5" />
+    <param name="scale_angular" value="1.0" />
+  </node>
+
+  <node pkg="sehyen_project" type="cmdvel_to_xycarmotor.py" name="cmdvel_to_xycarmotor" output="screen" />
+
+</launch>

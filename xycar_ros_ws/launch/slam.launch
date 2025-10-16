@@ -1,0 +1,17 @@
+<launch>
+  <arg name="config_dir"/>
+  <arg name="config_file_name"/>
+  <arg name="urdf_file"/>
+
+  <!-- Cartographer ONLINE -->
+  <node pkg="cartographer_ros" type="cartographer_node" name="cartographer_node"
+        args="-configuration_directory $(arg config_dir) \
+              -configuration_basename $(arg config_file_name)"
+        output="screen">
+    <remap from="scan" to="/scan"/>
+    <remap from="imu"  to="/imu/data"/>
+  </node>
+
+  <node pkg="cartographer_ros" type="cartographer_occupancy_grid_node"
+        name="carto_grid" args="-resolution 0.05 -publish_period_sec 1.0"/>
+</launch>
